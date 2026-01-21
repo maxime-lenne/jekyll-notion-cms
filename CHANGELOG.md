@@ -1,0 +1,37 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [1.0.0] - 2026-01-21
+
+### Added
+
+- Initial release of jekyll-notion-cms
+- Configurable collections via `_config.yml`
+- Support for multiple Notion property types:
+  - Title, Rich text, Number, Checkbox
+  - Date, Select, Multi-select, URL
+  - Email, Phone number, Files
+  - Rollup, Formula, Relation
+  - People, Status, Created/Last edited time
+- Multiple data organizers:
+  - `simple_list` - Sorted array of items
+  - `skills_by_category` - Skills grouped by category
+  - `grouped_by` - Items grouped by a field
+  - `nested` - Hierarchical tree structure
+- Automatic fallback to Jekyll collections
+- Pagination support for large databases
+- Data file caching to avoid unnecessary regeneration
+- Comprehensive logging
+
+### Security
+
+- Secure handling of Notion API tokens via environment variables
+
+[Unreleased]: https://github.com/maxime-lenne/jekyll-notion-cms/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/maxime-lenne/jekyll-notion-cms/releases/tag/v1.0.0
