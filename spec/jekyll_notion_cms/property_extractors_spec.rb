@@ -160,6 +160,415 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
         result = described_class.extract(properties, 'Link', 'url')
         expect(result).to eq('https://example.com')
       end
+
+      it 'returns nil for unknown type' do
+        properties = { 'Link' => { 'type' => 'unknown', 'unknown' => 'value' } }
+        result = described_class.extract(properties, 'Link', 'url')
+        expect(result).to be_nil
+      end
+    end
+
+    describe 'email property' do
+      it 'extracts email value' do
+        properties = { 'Email' => { 'type' => 'email', 'email' => 'test@example.com' } }
+        result = described_class.extract(properties, 'Email', 'email')
+        expect(result).to eq('test@example.com')
+      end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Email' => { 'type' => 'text', 'text' => 'test@example.com' } }
+        result = described_class.extract(properties, 'Email', 'email')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for null email' do
+        properties = { 'Email' => { 'type' => 'email', 'email' => nil } }
+        result = described_class.extract(properties, 'Email', 'email')
+        expect(result).to be_nil
+      end
+    end
+
+    describe 'phone_number property' do
+      it 'extracts phone number value' do
+        properties = { 'Phone' => { 'type' => 'phone_number', 'phone_number' => '+33612345678' } }
+        result = described_class.extract(properties, 'Phone', 'phone_number')
+        expect(result).to eq('+33612345678')
+      end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Phone' => { 'type' => 'text', 'text' => '+33612345678' } }
+        result = described_class.extract(properties, 'Phone', 'phone_number')
+        expect(result).to be_nil
+      end
+    end
+
+    describe 'formula property' do
+      it 'extracts string formula' do
+        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'string', 'string' => 'result' } } }
+        result = described_class.extract(properties, 'Computed', 'formula')
+        expect(result).to eq('result')
+      end
+
+      it 'extracts number formula' do
+        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'number', 'number' => 42 } } }
+        result = described_class.extract(properties, 'Computed', 'formula')
+        expect(result).to eq(42)
+      end
+
+      it 'extracts boolean formula' do
+        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'boolean', 'boolean' => true } } }
+        result = described_class.extract(properties, 'Computed', 'formula')
+        expect(result).to be true
+      end
+
+      it 'extracts date formula' do
+        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'date', 'date' => { 'start' => '2024-01-15' } } } }
+        result = described_class.extract(properties, 'Computed', 'formula')
+        expect(result).to eq('2024-01-15')
+      end
+
+      it 'returns nil for null date formula' do
+        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'date', 'date' => nil } } }
+        result = described_class.extract(properties, 'Computed', 'formula')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for unknown formula type' do
+        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'unknown', 'unknown' => 'value' } } }
+        result = described_class.extract(properties, 'Computed', 'formula')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for null formula' do
+        properties = { 'Computed' => { 'type' => 'formula', 'formula' => nil } }
+        result = described_class.extract(properties, 'Computed', 'formula')
+        expect(result).to be_nil
+      end
+    end
+
+    describe 'formula_array property' do
+      it 'extracts array formula with string items' do
+        properties = {
+          'Tags' => {
+            'type' => 'formula',
+            'formula' => {
+              'type' => 'array',
+              'array' => [
+                { 'type' => 'string', 'string' => 'tag1' },
+                { 'type' => 'string', 'string' => 'tag2' }
+              ]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq(%w[tag1 tag2])
+      end
+
+      it 'extracts array formula with rich_text items' do
+        properties = {
+          'Tags' => {
+            'type' => 'formula',
+            'formula' => {
+              'type' => 'array',
+              'array' => [
+                { 'type' => 'rich_text', 'rich_text' => [{ 'plain_text' => 'item1' }] }
+              ]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq(['item1'])
+      end
+
+      it 'filters nil items from array' do
+        properties = {
+          'Tags' => {
+            'type' => 'formula',
+            'formula' => {
+              'type' => 'array',
+              'array' => [
+                { 'type' => 'string', 'string' => 'tag1' },
+                { 'type' => 'unknown', 'unknown' => 'ignored' }
+              ]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq(['tag1'])
+      end
+
+      it 'parses string formula as array by delimiter' do
+        properties = {
+          'Tags' => {
+            'type' => 'formula',
+            'formula' => { 'type' => 'string', 'string' => '- item1- item2- item3' }
+          }
+        }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq(%w[item1 item2 item3])
+      end
+
+      it 'returns empty array for null formula' do
+        properties = { 'Tags' => { 'type' => 'formula', 'formula' => nil } }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for unknown formula type' do
+        properties = { 'Tags' => { 'type' => 'formula', 'formula' => { 'type' => 'number', 'number' => 42 } } }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for wrong property type' do
+        properties = { 'Tags' => { 'type' => 'text', 'text' => 'value' } }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq([])
+      end
+
+      it 'handles nil array in formula' do
+        properties = { 'Tags' => { 'type' => 'formula', 'formula' => { 'type' => 'array', 'array' => nil } } }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq([])
+      end
+
+      it 'handles nil rich_text in array item' do
+        properties = {
+          'Tags' => {
+            'type' => 'formula',
+            'formula' => {
+              'type' => 'array',
+              'array' => [{ 'type' => 'rich_text', 'rich_text' => nil }]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq([])
+      end
+
+      it 'handles empty string formula' do
+        properties = { 'Tags' => { 'type' => 'formula', 'formula' => { 'type' => 'string', 'string' => '' } } }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq([])
+      end
+
+      it 'handles nil string formula' do
+        properties = { 'Tags' => { 'type' => 'formula', 'formula' => { 'type' => 'string', 'string' => nil } } }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq([])
+      end
+    end
+
+    describe 'relation property' do
+      it 'extracts relation IDs' do
+        properties = {
+          'Related' => {
+            'type' => 'relation',
+            'relation' => [
+              { 'id' => 'abc-123' },
+              { 'id' => 'def-456' }
+            ]
+          }
+        }
+        result = described_class.extract(properties, 'Related', 'relation')
+        expect(result).to eq(%w[abc-123 def-456])
+      end
+
+      it 'returns empty array for empty relation' do
+        properties = { 'Related' => { 'type' => 'relation', 'relation' => [] } }
+        result = described_class.extract(properties, 'Related', 'relation')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for null relation' do
+        properties = { 'Related' => { 'type' => 'relation', 'relation' => nil } }
+        result = described_class.extract(properties, 'Related', 'relation')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for wrong type' do
+        properties = { 'Related' => { 'type' => 'text', 'text' => 'value' } }
+        result = described_class.extract(properties, 'Related', 'relation')
+        expect(result).to eq([])
+      end
+    end
+
+    describe 'people property' do
+      it 'extracts people with full info' do
+        properties = {
+          'Assignee' => {
+            'type' => 'people',
+            'people' => [
+              {
+                'id' => 'user-123',
+                'name' => 'John Doe',
+                'avatar_url' => 'https://example.com/avatar.png',
+                'person' => { 'email' => 'john@example.com' }
+              }
+            ]
+          }
+        }
+        result = described_class.extract(properties, 'Assignee', 'people')
+        expect(result).to eq([
+                               {
+                                 'id' => 'user-123',
+                                 'name' => 'John Doe',
+                                 'email' => 'john@example.com',
+                                 'avatar_url' => 'https://example.com/avatar.png'
+                               }
+                             ])
+      end
+
+      it 'extracts people with partial info' do
+        properties = {
+          'Assignee' => {
+            'type' => 'people',
+            'people' => [{ 'id' => 'user-123', 'name' => 'Jane Doe' }]
+          }
+        }
+        result = described_class.extract(properties, 'Assignee', 'people')
+        expect(result).to eq([{ 'id' => 'user-123', 'name' => 'Jane Doe' }])
+      end
+
+      it 'returns empty array for empty people' do
+        properties = { 'Assignee' => { 'type' => 'people', 'people' => [] } }
+        result = described_class.extract(properties, 'Assignee', 'people')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for null people' do
+        properties = { 'Assignee' => { 'type' => 'people', 'people' => nil } }
+        result = described_class.extract(properties, 'Assignee', 'people')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for wrong type' do
+        properties = { 'Assignee' => { 'type' => 'text', 'text' => 'value' } }
+        result = described_class.extract(properties, 'Assignee', 'people')
+        expect(result).to eq([])
+      end
+    end
+
+    describe 'files property' do
+      it 'extracts internal file URLs' do
+        properties = {
+          'Attachment' => {
+            'type' => 'files',
+            'files' => [
+              {
+                'name' => 'document.pdf',
+                'type' => 'file',
+                'file' => { 'url' => 'https://notion.so/files/document.pdf' }
+              }
+            ]
+          }
+        }
+        result = described_class.extract(properties, 'Attachment', 'files')
+        expect(result).to eq([
+                               {
+                                 'name' => 'document.pdf',
+                                 'url' => 'https://notion.so/files/document.pdf',
+                                 'type' => 'file'
+                               }
+                             ])
+      end
+
+      it 'extracts external file URLs' do
+        properties = {
+          'Attachment' => {
+            'type' => 'files',
+            'files' => [
+              {
+                'name' => 'image.png',
+                'type' => 'external',
+                'external' => { 'url' => 'https://example.com/image.png' }
+              }
+            ]
+          }
+        }
+        result = described_class.extract(properties, 'Attachment', 'files')
+        expect(result).to eq([
+                               {
+                                 'name' => 'image.png',
+                                 'url' => 'https://example.com/image.png',
+                                 'type' => 'external'
+                               }
+                             ])
+      end
+
+      it 'returns empty array for empty files' do
+        properties = { 'Attachment' => { 'type' => 'files', 'files' => [] } }
+        result = described_class.extract(properties, 'Attachment', 'files')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for null files' do
+        properties = { 'Attachment' => { 'type' => 'files', 'files' => nil } }
+        result = described_class.extract(properties, 'Attachment', 'files')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for wrong type' do
+        properties = { 'Attachment' => { 'type' => 'text', 'text' => 'value' } }
+        result = described_class.extract(properties, 'Attachment', 'files')
+        expect(result).to eq([])
+      end
+    end
+
+    describe 'created_time property' do
+      it 'extracts created time' do
+        properties = { 'Created' => { 'type' => 'created_time', 'created_time' => '2024-01-15T10:30:00.000Z' } }
+        result = described_class.extract(properties, 'Created', 'created_time')
+        expect(result).to eq('2024-01-15T10:30:00.000Z')
+      end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Created' => { 'type' => 'text', 'text' => '2024-01-15' } }
+        result = described_class.extract(properties, 'Created', 'created_time')
+        expect(result).to be_nil
+      end
+    end
+
+    describe 'last_edited_time property' do
+      it 'extracts last edited time' do
+        properties = { 'Updated' => { 'type' => 'last_edited_time', 'last_edited_time' => '2024-01-20T15:45:00.000Z' } }
+        result = described_class.extract(properties, 'Updated', 'last_edited_time')
+        expect(result).to eq('2024-01-20T15:45:00.000Z')
+      end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Updated' => { 'type' => 'text', 'text' => '2024-01-20' } }
+        result = described_class.extract(properties, 'Updated', 'last_edited_time')
+        expect(result).to be_nil
+      end
+    end
+
+    describe 'status property' do
+      it 'extracts status name' do
+        properties = { 'Status' => { 'type' => 'status', 'status' => { 'name' => 'In Progress' } } }
+        result = described_class.extract(properties, 'Status', 'status')
+        expect(result).to eq('In Progress')
+      end
+
+      it 'returns nil for null status' do
+        properties = { 'Status' => { 'type' => 'status', 'status' => nil } }
+        result = described_class.extract(properties, 'Status', 'status')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Status' => { 'type' => 'text', 'text' => 'Done' } }
+        result = described_class.extract(properties, 'Status', 'status')
+        expect(result).to be_nil
+      end
+    end
+
+    describe 'unknown property type' do
+      it 'returns nil for unknown type' do
+        properties = { 'Unknown' => { 'type' => 'unknown', 'unknown' => 'value' } }
+        result = described_class.extract(properties, 'Unknown', 'unknown_type')
+        expect(result).to be_nil
+      end
     end
 
     describe 'rollup property' do
