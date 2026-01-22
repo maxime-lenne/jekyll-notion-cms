@@ -18,8 +18,8 @@ module JekyllNotionCMS
       case organizer
       when 'simple_list'
         organize_simple_list(notion_data, properties_config, sort_by, sort_order)
-      when 'skills_by_category'
-        organize_skills_by_category(notion_data, properties_config)
+      when 'items_by_category'
+        organize_items_by_category(notion_data, properties_config)
       when 'grouped_by'
         group_field = config['group_by']
         organize_grouped_by(notion_data, properties_config, group_field, sort_by, sort_order)
@@ -53,12 +53,13 @@ module JekyllNotionCMS
       sort_items(items, sort_by, sort_order)
     end
 
-    # Organize skills grouped by category (special organizer)
+    # Organize items grouped by category
+    # Useful for skills, products, team members, or any items with category grouping
     # @param notion_data [Hash] Raw data from Notion API
     # @param properties_config [Array<Hash>] Property configuration
-    # @return [Hash] Skills grouped by category
-    def organize_skills_by_category(notion_data, _properties_config)
-      skills_by_category = {}
+    # @return [Hash] Items grouped by category
+    def organize_items_by_category(notion_data, _properties_config)
+      items_by_category = {}
 
       notion_data['results'].each do |page|
         properties = page['properties']
@@ -75,16 +76,16 @@ module JekyllNotionCMS
         category_color = PropertyExtractors.extract(properties, 'Color', 'rollup')
         category_order = PropertyExtractors.extract(properties, 'Category Order', 'rollup')
 
-        skills_by_category[category_name] ||= {
+        items_by_category[category_name] ||= {
           'title' => category_name,
           'category' => category_name,
           'subcategory' => nil,
           'icon' => category_icon,
           'order' => category_order || 999,
-          'skills' => []
+          'items' => []
         }
 
-        skills_by_category[category_name]['skills'] << {
+        items_by_category[category_name]['items'] << {
           'name' => name,
           'level' => level,
           'years' => years,
@@ -98,14 +99,14 @@ module JekyllNotionCMS
       end
 
       # Sort categories by order
-      skills_by_category = skills_by_category.sort_by { |_, data| data['order'].to_i }.to_h
+      items_by_category = items_by_category.sort_by { |_, data| data['order'].to_i }.to_h
 
-      # Sort skills within each category
-      skills_by_category.each_value do |data|
-        data['skills'].sort_by! { |skill| skill['order'].to_i }
+      # Sort items within each category
+      items_by_category.each_value do |data|
+        data['items'].sort_by! { |item| item['order'].to_i }
       end
 
-      skills_by_category
+      items_by_category
     end
 
     # Organize items grouped by a field

@@ -85,12 +85,12 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
     end
   end
 
-  describe '.organize_skills_by_category' do
-    let(:skills_data) do
+  describe '.organize_items_by_category' do
+    let(:items_data) do
       {
         'results' => [
           {
-            'id' => 'skill-1',
+            'id' => 'item-1',
             'properties' => {
               'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'Ruby' }] },
               'Level' => { 'type' => 'number', 'number' => 90 },
@@ -99,7 +99,7 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
             }
           },
           {
-            'id' => 'skill-2',
+            'id' => 'item-2',
             'properties' => {
               'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'Python' }] },
               'Level' => { 'type' => 'number', 'number' => 85 },
@@ -108,7 +108,7 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
             }
           },
           {
-            'id' => 'skill-3',
+            'id' => 'item-3',
             'properties' => {
               'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'React' }] },
               'Level' => { 'type' => 'number', 'number' => 80 },
@@ -120,26 +120,26 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
       }
     end
 
-    it 'groups skills by category' do
-      result = described_class.organize_skills_by_category(skills_data, [])
+    it 'groups items by category' do
+      result = described_class.organize_items_by_category(items_data, [])
       expect(result.keys).to contain_exactly('Backend', 'Frontend')
     end
 
     it 'includes category metadata' do
-      result = described_class.organize_skills_by_category(skills_data, [])
+      result = described_class.organize_items_by_category(items_data, [])
       expect(result['Backend']['title']).to eq('Backend')
       expect(result['Backend']['category']).to eq('Backend')
     end
 
-    it 'includes skills in each category' do
-      result = described_class.organize_skills_by_category(skills_data, [])
-      expect(result['Backend']['skills'].length).to eq(2)
-      expect(result['Frontend']['skills'].length).to eq(1)
+    it 'includes items in each category' do
+      result = described_class.organize_items_by_category(items_data, [])
+      expect(result['Backend']['items'].length).to eq(2)
+      expect(result['Frontend']['items'].length).to eq(1)
     end
 
-    it 'sorts skills within categories by order' do
-      result = described_class.organize_skills_by_category(skills_data, [])
-      expect(result['Backend']['skills'].first['name']).to eq('Ruby')
+    it 'sorts items within categories by order' do
+      result = described_class.organize_items_by_category(items_data, [])
+      expect(result['Backend']['items'].first['name']).to eq('Ruby')
     end
   end
 

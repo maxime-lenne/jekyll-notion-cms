@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING**: Renamed `skills_by_category` organizer to `items_by_category` for more generic usage
+- **BREAKING**: Output key `skills` renamed to `items` in `items_by_category` organizer
+
+### Added
+
+- Documentation: use cases, examples (projects, services, testimonials, skills)
+- Documentation: automation section with GitHub Actions and n8n workflow templates
+- Architecture diagram
+
 ## [1.0.0] - 2026-01-21
 
 ### Added
@@ -21,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - People, Status, Created/Last edited time
 - Multiple data organizers:
   - `simple_list` - Sorted array of items
-  - `skills_by_category` - Skills grouped by category
+  - `items_by_category` - Items grouped by category (skills, products, etc.)
   - `grouped_by` - Items grouped by a field
   - `nested` - Hierarchical tree structure
 - Automatic fallback to Jekyll collections

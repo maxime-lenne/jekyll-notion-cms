@@ -386,7 +386,7 @@ notion:
     skills:
       database_env: NOTION_SKILLS_DB
       data_file: notion_skills.yml
-      organizer: skills_by_category
+      organizer: items_by_category
       properties:
         - { name: Name, type: title }
         - { name: Category, type: rollup }
@@ -408,13 +408,13 @@ notion:
       {{ category[1].title }}
     </h3>
     <div class="skills-grid">
-      {% for skill in category[1].skills %}
+      {% for item in category[1].items %}
         <div class="skill">
-          <span class="skill-name">{{ skill.name }}</span>
+          <span class="skill-name">{{ item.name }}</span>
           <div class="skill-bar">
-            <div class="skill-level" style="width: {{ skill.level }}%"></div>
+            <div class="skill-level" style="width: {{ item.level }}%"></div>
           </div>
-          <span class="skill-years">{{ skill.years }} years</span>
+          <span class="skill-years">{{ item.years }} years</span>
         </div>
       {% endfor %}
     </div>
@@ -448,12 +448,12 @@ sort_by: order
 sort_order: asc
 ```
 
-#### `skills_by_category`
+#### `items_by_category`
 
-Groups skills by their category. Designed for skills/competencies display.
+Groups items by their category. Useful for skills, products, team members, or any categorized content.
 
 ```yaml
-organizer: skills_by_category
+organizer: items_by_category
 ```
 
 Output structure:
@@ -462,7 +462,7 @@ Backend:
   title: Backend
   icon: code
   order: 1
-  skills:
+  items:
     - name: Ruby
       level: 90
       years: 10
