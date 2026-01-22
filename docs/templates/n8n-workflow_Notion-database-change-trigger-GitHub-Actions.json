@@ -1,0 +1,184 @@
+{
+  "name": "Notion to GitHub Actions Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "workflow",
+        "owner": {
+          "mode": "list",
+          "value": "YOUR_GITHUB_USERNAME"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "your-repository-name",
+          "mode": "list",
+          "cachedResultName": "your-repository-name",
+          "cachedResultUrl": "https://github.com/YOUR_GITHUB_USERNAME/your-repository-name"
+        },
+        "workflowId": {
+          "__rl": true,
+          "value": 123456789,
+          "mode": "list",
+          "cachedResultName": "Notion Sync Workflow"
+        },
+        "ref": {
+          "__rl": true,
+          "value": "main",
+          "mode": "list",
+          "cachedResultName": "main"
+        },
+        "inputs": "={\n  \"notion_event\": \"event\",\n  \"page_id\": \"{{ $json.id }}\",\n  \"database_id\": \"skills\",\n  \"updated_at\": \"=now\"\n}"
+      },
+      "id": "github-dispatch-1",
+      "name": "Trigger GitHub Action",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        608,
+        304
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "githubApi": {
+          "id": "YOUR_GITHUB_CREDENTIAL_ID",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "event": "pagedUpdatedInDatabase",
+        "databaseId": {
+          "__rl": true,
+          "value": "YOUR_NOTION_DATABASE_ID",
+          "mode": "list",
+          "cachedResultName": "Your Database Name",
+          "cachedResultUrl": "https://www.notion.so/YOUR_NOTION_DATABASE_ID"
+        }
+      },
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        96
+      ],
+      "id": "notion-trigger-1",
+      "name": "Notion Trigger",
+      "credentials": {
+        "notionApi": {
+          "id": "YOUR_NOTION_CREDENTIAL_ID",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "databaseId": {
+          "__rl": true,
+          "value": "YOUR_NOTION_DATABASE_ID_2",
+          "mode": "list",
+          "cachedResultName": "Your Second Database",
+          "cachedResultUrl": "https://www.notion.so/YOUR_NOTION_DATABASE_ID_2"
+        }
+      },
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        304
+      ],
+      "id": "notion-trigger-2",
+      "name": "Notion Trigger 2",
+      "credentials": {
+        "notionApi": {
+          "id": "YOUR_NOTION_CREDENTIAL_ID",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=Deployment via GitHub Action successfully triggered!",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "telegram-notification-1",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.telegram",
+      "position": [
+        880,
+        304
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Notion Trigger": {
+      "main": [
+        [
+          {
+            "node": "Trigger GitHub Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion Trigger 2": {
+      "main": [
+        [
+          {
+            "node": "Trigger GitHub Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger GitHub Action": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

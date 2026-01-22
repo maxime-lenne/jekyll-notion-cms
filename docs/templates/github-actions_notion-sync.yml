@@ -1,0 +1,101 @@
+name: Notion Sync Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      notion_event:
+        description: 'Type of Notion event'
+        required: true
+        type: string
+      page_id:
+        description: 'Notion page ID'
+        required: true
+        type: string
+      database_id:
+        description: 'Notion database ID'
+        required: true
+        type: string
+      updated_at:
+        description: 'Last update timestamp'
+        required: true
+        type: string
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Process Notion update
+        env:
+          NOTION_EVENT: ${{ inputs.notion_event }}
+          PAGE_ID: ${{ inputs.page_id }}
+          DATABASE_ID: ${{ inputs.database_id }}
+          UPDATED_AT: ${{ inputs.updated_at }}
+        run: |
+          echo "📝 Notion event: $NOTION_EVENT"
+          echo "🆔 Page ID: $PAGE_ID"
+          echo "🗄️  Database ID: $DATABASE_ID"
+          echo "⏰ Updated at: $UPDATED_AT"
+          
+          # Ajoutez votre logique ici
+          # Exemples:
+          # - Regénérer un site statique
+          # - Déployer du contenu
+          # - Synchroniser avec un autre service
+          # - Envoyer des notifications
+      
+      - name: Your custom action
+        run: |
+          echo "🚀 Executing your custom logic..."
+          # Votre code personnalisé ici
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Ruby
+        # https://github.com/ruby/setup-ruby/releases/tag/v1.207.0
+        uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4
+        with:
+          ruby-version: '3.3.5' # Not needed with a .ruby-version file
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          cache-version: 0 # Increment this number if you need to re-download cached gems
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Build with Jekyll
+        # Outputs to the './_site' directory by default
+        run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          # Add your Notion database secrets below:
+          # NOTION_BLOG_DB: ${{ secrets.NOTION_BLOG_DB }}
+          # NOTION_PROJECTS_DB: ${{ secrets.NOTION_PROJECTS_DB }}
+          # NOTION_EXPERIENCES_DB: ${{ secrets.NOTION_EXPERIENCES_DB }}
+          # NOTION_SKILLS_DB: ${{ secrets.NOTION_SKILLS_DB }}
+          # NOTION_SERVICES_DB: ${{ secrets.NOTION_SERVICES_DB }}
+          # NOTION_TESTIMONIALS_DB: ${{ secrets.NOTION_TESTIMONIALS_DB }}
+      - name: Upload artifact
+        # Automatically uploads an artifact from the './_site' directory by default
+        uses: actions/upload-pages-artifact@v3
+
+  # Deployment job
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -21,6 +21,12 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
         result = described_class.extract(properties, 'Missing', 'title')
         expect(result).to be_nil
       end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Name' => { 'type' => 'text', 'text' => 'Hello' } }
+        result = described_class.extract(properties, 'Name', 'title')
+        expect(result).to be_nil
+      end
     end
 
     describe 'rich_text property' do
@@ -40,6 +46,18 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
 
       it 'returns nil for empty rich text' do
         properties['Description']['rich_text'] = []
+        result = described_class.extract(properties, 'Description', 'rich_text')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Description' => { 'type' => 'text', 'text' => 'Some text' } }
+        result = described_class.extract(properties, 'Description', 'rich_text')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for nil rich_text' do
+        properties = { 'Description' => { 'type' => 'rich_text', 'rich_text' => nil } }
         result = described_class.extract(properties, 'Description', 'rich_text')
         expect(result).to be_nil
       end
@@ -68,6 +86,60 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
           result = described_class.extract(properties, 'Level', 'number')
           expect(result).to eq(90)
         end
+
+        it 'converts Avancé to 90' do
+          properties['Level']['select']['name'] = 'Avancé'
+          result = described_class.extract(properties, 'Level', 'number')
+          expect(result).to eq(90)
+        end
+
+        it 'converts Advanced to 90' do
+          properties['Level']['select']['name'] = 'Advanced'
+          result = described_class.extract(properties, 'Level', 'number')
+          expect(result).to eq(90)
+        end
+
+        it 'converts Intermédiaire to 70' do
+          properties['Level']['select']['name'] = 'Intermédiaire'
+          result = described_class.extract(properties, 'Level', 'number')
+          expect(result).to eq(70)
+        end
+
+        it 'converts Intermediate to 70' do
+          properties['Level']['select']['name'] = 'Intermediate'
+          result = described_class.extract(properties, 'Level', 'number')
+          expect(result).to eq(70)
+        end
+
+        it 'converts Débutant to 50' do
+          properties['Level']['select']['name'] = 'Débutant'
+          result = described_class.extract(properties, 'Level', 'number')
+          expect(result).to eq(50)
+        end
+
+        it 'converts Beginner to 50' do
+          properties['Level']['select']['name'] = 'Beginner'
+          result = described_class.extract(properties, 'Level', 'number')
+          expect(result).to eq(50)
+        end
+
+        it 'returns nil for unknown select value' do
+          properties['Level']['select']['name'] = 'Unknown Level'
+          result = described_class.extract(properties, 'Level', 'number')
+          expect(result).to be_nil
+        end
+
+        it 'returns nil for null select' do
+          properties['Level']['select'] = nil
+          result = described_class.extract(properties, 'Level', 'number')
+          expect(result).to be_nil
+        end
+      end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Level' => { 'type' => 'text', 'text' => '42' } }
+        result = described_class.extract(properties, 'Level', 'number')
+        expect(result).to be_nil
       end
     end
 
@@ -80,6 +152,12 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
 
       it 'extracts false checkbox' do
         properties = { 'Featured' => { 'type' => 'checkbox', 'checkbox' => false } }
+        result = described_class.extract(properties, 'Featured', 'checkbox')
+        expect(result).to be false
+      end
+
+      it 'returns false for wrong type' do
+        properties = { 'Featured' => { 'type' => 'text', 'text' => 'yes' } }
         result = described_class.extract(properties, 'Featured', 'checkbox')
         expect(result).to be false
       end
@@ -105,6 +183,24 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
         result = described_class.extract(properties, 'Start Date', 'date')
         expect(result).to be_nil
       end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Start Date' => { 'type' => 'text', 'text' => '2024-01-15' } }
+        result = described_class.extract(properties, 'Start Date', 'date')
+        expect(result).to be_nil
+      end
+
+      it 'compacts nil fields from date' do
+        properties = {
+          'Start Date' => {
+            'type' => 'date',
+            'date' => { 'start' => '2024-01-15', 'end' => nil, 'time_zone' => nil }
+          }
+        }
+        result = described_class.extract(properties, 'Start Date', 'date')
+        expect(result).to eq({ 'start' => '2024-01-15' })
+        expect(result.keys).not_to include('end', 'time_zone')
+      end
     end
 
     describe 'select property' do
@@ -121,6 +217,12 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
 
       it 'returns nil for null select' do
         properties['Status']['select'] = nil
+        result = described_class.extract(properties, 'Status', 'select')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for wrong type' do
+        properties = { 'Status' => { 'type' => 'text', 'text' => 'Published' } }
         result = described_class.extract(properties, 'Status', 'select')
         expect(result).to be_nil
       end
@@ -143,6 +245,12 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
 
       it 'returns empty array for empty multi_select' do
         properties['Tags']['multi_select'] = []
+        result = described_class.extract(properties, 'Tags', 'multi_select')
+        expect(result).to eq([])
+      end
+
+      it 'returns empty array for wrong type' do
+        properties = { 'Tags' => { 'type' => 'text', 'text' => 'Ruby, Jekyll' } }
         result = described_class.extract(properties, 'Tags', 'multi_select')
         expect(result).to eq([])
       end
@@ -306,6 +414,28 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
         }
         result = described_class.extract(properties, 'Tags', 'formula_array')
         expect(result).to eq(%w[item1 item2 item3])
+      end
+
+      it 'cleans leading and trailing dots from parsed items' do
+        properties = {
+          'Tags' => {
+            'type' => 'formula',
+            'formula' => { 'type' => 'string', 'string' => '- ...item1...- ..item2..- item3' }
+          }
+        }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq(%w[item1 item2 item3])
+      end
+
+      it 'filters out empty items after cleaning' do
+        properties = {
+          'Tags' => {
+            'type' => 'formula',
+            'formula' => { 'type' => 'string', 'string' => '- ...- item1- - item2' }
+          }
+        }
+        result = described_class.extract(properties, 'Tags', 'formula_array')
+        expect(result).to eq(%w[item1 item2])
       end
 
       it 'returns empty array for null formula' do
@@ -572,8 +702,8 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
     end
 
     describe 'rollup property' do
-      let(:properties) do
-        {
+      it 'extracts first value from rollup array with title' do
+        properties = {
           'Category' => {
             'type' => 'rollup',
             'rollup' => {
@@ -582,11 +712,156 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
             }
           }
         }
-      end
-
-      it 'extracts first value from rollup array' do
         result = described_class.extract(properties, 'Category', 'rollup')
         expect(result).to eq('Backend')
+      end
+
+      it 'extracts first value from rollup array with rich_text' do
+        properties = {
+          'Category' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [{ 'type' => 'rich_text', 'rich_text' => [{ 'plain_text' => 'Description' }] }]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Category', 'rollup')
+        expect(result).to eq('Description')
+      end
+
+      it 'extracts first value from rollup array with select' do
+        properties = {
+          'Category' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [{ 'type' => 'select', 'select' => { 'name' => 'Option A' } }]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Category', 'rollup')
+        expect(result).to eq('Option A')
+      end
+
+      it 'extracts first value from rollup array with number' do
+        properties = {
+          'Category' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [{ 'type' => 'number', 'number' => 42 }]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Category', 'rollup')
+        expect(result).to eq(42)
+      end
+
+      it 'returns nil for unknown item type in rollup array' do
+        properties = {
+          'Category' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [{ 'type' => 'unknown', 'unknown' => 'value' }]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Category', 'rollup')
+        expect(result).to be_nil
+      end
+
+      it 'extracts number from rollup' do
+        properties = {
+          'Count' => {
+            'type' => 'rollup',
+            'rollup' => { 'type' => 'number', 'number' => 10 }
+          }
+        }
+        result = described_class.extract(properties, 'Count', 'rollup')
+        expect(result).to eq(10)
+      end
+
+      it 'extracts date from rollup' do
+        properties = {
+          'Due' => {
+            'type' => 'rollup',
+            'rollup' => { 'type' => 'date', 'date' => { 'start' => '2024-06-15' } }
+          }
+        }
+        result = described_class.extract(properties, 'Due', 'rollup')
+        expect(result).to eq('2024-06-15')
+      end
+
+      it 'returns nil for null date in rollup' do
+        properties = {
+          'Due' => {
+            'type' => 'rollup',
+            'rollup' => { 'type' => 'date', 'date' => nil }
+          }
+        }
+        result = described_class.extract(properties, 'Due', 'rollup')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for unknown rollup type' do
+        properties = {
+          'Data' => {
+            'type' => 'rollup',
+            'rollup' => { 'type' => 'unknown', 'unknown' => 'value' }
+          }
+        }
+        result = described_class.extract(properties, 'Data', 'rollup')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for wrong property type' do
+        properties = { 'Data' => { 'type' => 'text', 'text' => 'value' } }
+        result = described_class.extract(properties, 'Data', 'rollup')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for null rollup' do
+        properties = { 'Data' => { 'type' => 'rollup', 'rollup' => nil } }
+        result = described_class.extract(properties, 'Data', 'rollup')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for nil rollup array' do
+        properties = {
+          'Data' => {
+            'type' => 'rollup',
+            'rollup' => { 'type' => 'array', 'array' => nil }
+          }
+        }
+        result = described_class.extract(properties, 'Data', 'rollup')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for empty rollup array' do
+        properties = {
+          'Data' => {
+            'type' => 'rollup',
+            'rollup' => { 'type' => 'array', 'array' => [] }
+          }
+        }
+        result = described_class.extract(properties, 'Data', 'rollup')
+        expect(result).to be_nil
+      end
+
+      it 'returns nil for null select in rollup array' do
+        properties = {
+          'Category' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [{ 'type' => 'select', 'select' => nil }]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Category', 'rollup')
+        expect(result).to be_nil
       end
     end
   end
@@ -619,6 +894,47 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
       config[0]['key'] = 'name'
       result = described_class.extract_all(properties, config)
       expect(result['name']).to eq('Test Item')
+    end
+
+    it 'falls back to name when title is not present' do
+      properties = {
+        'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'Item Name' }] },
+        'Level' => { 'type' => 'number', 'number' => 85 }
+      }
+      config = [
+        { 'name' => 'Name', 'type' => 'title', 'key' => 'name' },
+        { 'name' => 'Level', 'type' => 'number' }
+      ]
+      result = described_class.extract_all(properties, config)
+      expect(result['title']).to eq('Item Name')
+      expect(result['name']).to eq('Item Name')
+    end
+
+    it 'does not overwrite existing title with name' do
+      properties = {
+        'Title' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'Actual Title' }] },
+        'Name' => { 'type' => 'rich_text', 'rich_text' => [{ 'plain_text' => 'Different Name' }] }
+      }
+      config = [
+        { 'name' => 'Title', 'type' => 'title' },
+        { 'name' => 'Name', 'type' => 'rich_text', 'key' => 'name' }
+      ]
+      result = described_class.extract_all(properties, config)
+      expect(result['title']).to eq('Actual Title')
+      expect(result['name']).to eq('Different Name')
+    end
+
+    it 'handles missing properties gracefully' do
+      properties = {
+        'Title' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'Test' }] }
+      }
+      config = [
+        { 'name' => 'Title', 'type' => 'title' },
+        { 'name' => 'Missing', 'type' => 'number' }
+      ]
+      result = described_class.extract_all(properties, config)
+      expect(result['title']).to eq('Test')
+      expect(result['missing']).to be_nil
     end
   end
 
