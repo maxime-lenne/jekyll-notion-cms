@@ -5,19 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-### Changed
-
-- **BREAKING**: Renamed `skills_by_category` organizer to `items_by_category` for more generic usage
-- **BREAKING**: Output key `skills` renamed to `items` in `items_by_category` organizer
-
-### Added
-
-- Documentation: use cases, examples (projects, services, testimonials, skills)
-- Documentation: automation section with GitHub Actions and n8n workflow templates
-- Architecture diagram
-
 ## [1.0.0] - 2026-01-21
 
 ### Added
@@ -39,10 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pagination support for large databases
 - Data file caching to avoid unnecessary regeneration
 - Comprehensive logging
+- Documentation: use cases, examples (projects, services, testimonials, skills)
+- Documentation: automation section with GitHub Actions and n8n workflow templates
+- Architecture diagram
 
 ### Security
 
 - Secure handling of Notion API tokens via environment variables
 
-[Unreleased]: https://github.com/maxime-lenne/jekyll-notion-cms/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/maxime-lenne/jekyll-notion-cms/releases/tag/v1.0.0
