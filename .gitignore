@@ -28,3 +28,5 @@ Thumbs.db
 # Environment
 .env
 .env.local
+/.tool-versions
+/.claude/
