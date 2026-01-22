@@ -360,3 +360,12 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 - GitHub: [@maxime-lenne](https://github.com/maxime-lenne)
 - LinkedIn: [maximelenne](https://linkedin.com/in/maximelenne)
+
+##  N8Ninja : Automate your n8n workflows from your iPhone
+<a href="https://n8n-ninja.app">N8Ninja</a> lets you manage, monitor, and trigger your n8n automations
+directly from your iPhone. Intuitive interface, real-time notifications,
+and full control over your workflows.
+
+<a href="https://apps.apple.com/fr/app/n8ninja-automatisations-n8n/id6746260475" class="app-store-badge">
+    <img src="docs/Download_on_the_App_Store_Badge_FR_RGB_wht_100217.svg" alt="Télécharger sur l'App Store" />
+</a>
