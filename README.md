@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  [![Gem Version](https://badge.fury.io/rb/jekyll-notion-cms.svg)](https://badge.fury.io/rb/jekyll-notion-cms)
+  <a href="https://badge.fury.io/rb/jekyll-notion-cms"><img src="https://badge.fury.io/rb/jekyll-notion-cms.svg" alt="Gem Version" /></a>
   <a href="https://github.com/maxime-lenne/jekyll-notion-cms/actions/workflows/ci.yml"><img src="https://github.com/maxime-lenne/jekyll-notion-cms/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
 </p>
