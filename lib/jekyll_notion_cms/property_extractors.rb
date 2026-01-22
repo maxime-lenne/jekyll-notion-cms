@@ -191,11 +191,11 @@ module JekyllNotionCMS
       end
     end
 
-    # Extract first value from rollup array
+    # Extract values from rollup array
     def extract_rollup_array(array)
       return nil if array.nil? || array.empty?
 
-      array.map do |item|
+      values = array.map do |item|
         case item['type']
         when 'title'
           item['title'].map { |text| text['plain_text'] }.join
@@ -206,7 +206,12 @@ module JekyllNotionCMS
         when 'number'
           item['number']
         end
-      end.compact.first
+      end.compact
+
+      return nil if values.empty?
+
+      # Return single value if only one, otherwise return array
+      values.length == 1 ? values.first : values
     end
 
     # Formula property

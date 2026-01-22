@@ -352,7 +352,7 @@ sort_by: order
 | `email` | Email | String |
 | `phone_number` | Phone | String |
 | `files` | Files & media | Array of file objects |
-| `rollup` | Rollup | Value from related database |
+| `rollup` | Rollup | Single value or array from related database |
 | `formula` | Formula | Computed value |
 | `formula_array` | Formula (array) | Array of values |
 | `relation` | Relation | Array of page IDs |

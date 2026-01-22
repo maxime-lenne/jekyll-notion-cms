@@ -866,6 +866,76 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
         result = described_class.extract(properties, 'Category', 'rollup')
         expect(result).to be_nil
       end
+
+      it 'returns array when rollup has multiple title values' do
+        properties = {
+          'Categories' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [
+                { 'type' => 'title', 'title' => [{ 'plain_text' => 'Backend' }] },
+                { 'type' => 'title', 'title' => [{ 'plain_text' => 'Frontend' }] }
+              ]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Categories', 'rollup')
+        expect(result).to eq(%w[Backend Frontend])
+      end
+
+      it 'returns array when rollup has multiple select values' do
+        properties = {
+          'Tags' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [
+                { 'type' => 'select', 'select' => { 'name' => 'Ruby' } },
+                { 'type' => 'select', 'select' => { 'name' => 'Python' } },
+                { 'type' => 'select', 'select' => { 'name' => 'JavaScript' } }
+              ]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Tags', 'rollup')
+        expect(result).to eq(%w[Ruby Python JavaScript])
+      end
+
+      it 'returns array when rollup has multiple number values' do
+        properties = {
+          'Scores' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [
+                { 'type' => 'number', 'number' => 10 },
+                { 'type' => 'number', 'number' => 20 }
+              ]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Scores', 'rollup')
+        expect(result).to eq([10, 20])
+      end
+
+      it 'filters out nil values from multiple rollup items' do
+        properties = {
+          'Mixed' => {
+            'type' => 'rollup',
+            'rollup' => {
+              'type' => 'array',
+              'array' => [
+                { 'type' => 'select', 'select' => { 'name' => 'Valid' } },
+                { 'type' => 'select', 'select' => nil },
+                { 'type' => 'select', 'select' => { 'name' => 'Also Valid' } }
+              ]
+            }
+          }
+        }
+        result = described_class.extract(properties, 'Mixed', 'rollup')
+        expect(result).to eq(['Valid', 'Also Valid'])
+      end
     end
   end
 
