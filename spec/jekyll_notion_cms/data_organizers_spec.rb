@@ -94,7 +94,10 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
             'properties' => {
               'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'Ruby' }] },
               'Level' => { 'type' => 'number', 'number' => 90 },
-              'Category' => { 'type' => 'rollup', 'rollup' => { 'type' => 'array', 'array' => [{ 'type' => 'title', 'title' => [{ 'plain_text' => 'Backend' }] }] } },
+              'Category' => { 'type' => 'rollup',
+                              'rollup' => { 'type' => 'array',
+                                            'array' => [{ 'type' => 'title',
+                                                          'title' => [{ 'plain_text' => 'Backend' }] }] } },
               'Order' => { 'type' => 'number', 'number' => 1 }
             }
           },
@@ -103,7 +106,10 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
             'properties' => {
               'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'Python' }] },
               'Level' => { 'type' => 'number', 'number' => 85 },
-              'Category' => { 'type' => 'rollup', 'rollup' => { 'type' => 'array', 'array' => [{ 'type' => 'title', 'title' => [{ 'plain_text' => 'Backend' }] }] } },
+              'Category' => { 'type' => 'rollup',
+                              'rollup' => { 'type' => 'array',
+                                            'array' => [{ 'type' => 'title',
+                                                          'title' => [{ 'plain_text' => 'Backend' }] }] } },
               'Order' => { 'type' => 'number', 'number' => 2 }
             }
           },
@@ -112,7 +118,10 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
             'properties' => {
               'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'React' }] },
               'Level' => { 'type' => 'number', 'number' => 80 },
-              'Category' => { 'type' => 'rollup', 'rollup' => { 'type' => 'array', 'array' => [{ 'type' => 'title', 'title' => [{ 'plain_text' => 'Frontend' }] }] } },
+              'Category' => { 'type' => 'rollup',
+                              'rollup' => { 'type' => 'array',
+                                            'array' => [{ 'type' => 'title',
+                                                          'title' => [{ 'plain_text' => 'Frontend' }] }] } },
               'Order' => { 'type' => 'number', 'number' => 1 }
             }
           }

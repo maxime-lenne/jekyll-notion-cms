@@ -53,8 +53,6 @@ module JekyllNotionCMS
         extract_last_edited_time(property)
       when 'status'
         extract_status(property)
-      else
-        nil
       end
     end
 
@@ -91,7 +89,7 @@ module JekyllNotionCMS
     def extract_title(property)
       return nil unless property['type'] == 'title'
 
-      property['title'].map { |text| text['plain_text'] }.join('')
+      property['title'].map { |text| text['plain_text'] }.join
     end
 
     # Rich text property
@@ -99,7 +97,7 @@ module JekyllNotionCMS
       return nil unless property['type'] == 'rich_text'
       return nil if property['rich_text'].nil? || property['rich_text'].empty?
 
-      property['rich_text'].map { |text| text['plain_text'] }.join('')
+      property['rich_text'].map { |text| text['plain_text'] }.join
     end
 
     # Number property (also handles select-to-number conversion)
@@ -109,8 +107,6 @@ module JekyllNotionCMS
         property['number']
       when 'select'
         convert_select_to_number(property['select']&.dig('name'))
-      else
-        nil
       end
     end
 
@@ -120,7 +116,6 @@ module JekyllNotionCMS
       when 'Expert', 'Avancé', 'Advanced' then 90
       when 'Intermédiaire', 'Intermediate' then 70
       when 'Débutant', 'Beginner' then 50
-      else nil
       end
     end
 
@@ -162,8 +157,6 @@ module JekyllNotionCMS
         property['url']
       when 'rich_text'
         extract_rich_text(property)
-      else
-        nil
       end
     end
 
@@ -195,8 +188,6 @@ module JekyllNotionCMS
         rollup['number']
       when 'date'
         rollup['date']&.dig('start')
-      else
-        nil
       end
     end
 
@@ -207,15 +198,13 @@ module JekyllNotionCMS
       array.map do |item|
         case item['type']
         when 'title'
-          item['title'].map { |text| text['plain_text'] }.join('')
+          item['title'].map { |text| text['plain_text'] }.join
         when 'rich_text'
-          item['rich_text'].map { |text| text['plain_text'] }.join('')
+          item['rich_text'].map { |text| text['plain_text'] }.join
         when 'select'
           item['select']&.dig('name')
         when 'number'
           item['number']
-        else
-          nil
         end
       end.compact.first
     end
@@ -236,8 +225,6 @@ module JekyllNotionCMS
         formula['boolean']
       when 'date'
         formula['date']&.dig('start')
-      else
-        nil
       end
     end
 
@@ -267,9 +254,7 @@ module JekyllNotionCMS
         when 'string'
           item['string']
         when 'rich_text'
-          item['rich_text']&.map { |text| text['plain_text'] }&.join('')
-        else
-          nil
+          item['rich_text']&.map { |text| text['plain_text'] }&.join
         end
       end.compact
     end
@@ -278,7 +263,7 @@ module JekyllNotionCMS
     def parse_formula_string(string_value)
       return [] if string_value.nil? || string_value.empty?
 
-      string_value.split(/- /).map do |item|
+      string_value.split('- ').map do |item|
         cleaned = item.strip.gsub(/^\.+|\.+$/, '')
         cleaned.empty? ? nil : cleaned
       end.compact

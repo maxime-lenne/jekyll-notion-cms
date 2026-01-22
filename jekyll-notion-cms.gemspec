@@ -9,7 +9,9 @@ Gem::Specification.new do |spec|
   spec.email         = ['hello@maxime-lenne.fr']
 
   spec.summary       = 'Jekyll plugin to sync content from Notion databases'
-  spec.description   = 'A configurable Jekyll plugin that fetches content from Notion databases and makes it available as Jekyll data files. Supports multiple collections, various property types, and automatic fallback to Jekyll collections.'
+  spec.description   = 'A configurable Jekyll plugin that fetches content from Notion databases ' \
+                       'and makes it available as Jekyll data files. Supports multiple collections, ' \
+                       'various property types, and automatic fallback to Jekyll collections.'
   spec.homepage      = 'https://github.com/maxime-lenne/jekyll-notion-cms'
   spec.license       = 'MIT'
   spec.required_ruby_version = '>= 2.7.0'
@@ -40,6 +42,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.12'
   spec.add_development_dependency 'rubocop', '~> 1.50'
   spec.add_development_dependency 'rubocop-rspec', '~> 2.20'
-  spec.add_development_dependency 'webmock', '~> 3.18'
   spec.add_development_dependency 'simplecov', '~> 0.22'
+  spec.add_development_dependency 'webmock', '~> 3.18'
 end

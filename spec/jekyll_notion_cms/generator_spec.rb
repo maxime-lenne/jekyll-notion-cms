@@ -7,10 +7,7 @@ RSpec.describe JekyllNotionCMS::Generator do
   let(:generator) { described_class.new }
 
   before do
-    allow(site).to receive(:source).and_return(source_dir)
-    allow(site).to receive(:data).and_return({})
-    allow(site).to receive(:config).and_return({})
-    allow(site).to receive(:collections).and_return({})
+    allow(site).to receive_messages(source: source_dir, data: {}, config: {}, collections: {})
     allow(Jekyll.logger).to receive(:info)
     allow(Jekyll.logger).to receive(:warn)
     allow(Jekyll.logger).to receive(:error)
@@ -252,7 +249,8 @@ RSpec.describe JekyllNotionCMS::Generator do
 
     context 'when database_id is missing' do
       it 'uses fallback' do
-        expect(Jekyll.logger).to receive(:info).with('NotionCMS:', 'No TEST_DB found, using fallback for test_collection')
+        expect(Jekyll.logger).to receive(:info).with('NotionCMS:',
+                                                     'No TEST_DB found, using fallback for test_collection')
         generator.generate(site)
         generator.send(:fetch_collection_data, 'test_collection', config)
       end
@@ -265,7 +263,8 @@ RSpec.describe JekyllNotionCMS::Generator do
 
       it 'uses fallback' do
         generator.generate(site)
-        expect(Jekyll.logger).to receive(:info).with('NotionCMS:', 'No TEST_DB found, using fallback for test_collection')
+        expect(Jekyll.logger).to receive(:info).with('NotionCMS:',
+                                                     'No TEST_DB found, using fallback for test_collection')
         generator.send(:fetch_collection_data, 'test_collection', config)
       end
     end
@@ -277,7 +276,8 @@ RSpec.describe JekyllNotionCMS::Generator do
 
       it 'uses fallback' do
         generator.generate(site)
-        expect(Jekyll.logger).to receive(:info).with('NotionCMS:', 'No TEST_DB found, using fallback for test_collection')
+        expect(Jekyll.logger).to receive(:info).with('NotionCMS:',
+                                                     'No TEST_DB found, using fallback for test_collection')
         generator.send(:fetch_collection_data, 'test_collection', config)
       end
     end
@@ -425,7 +425,8 @@ RSpec.describe JekyllNotionCMS::Generator do
       let(:doc1) do
         instance_double(
           Jekyll::Document,
-          data: { 'title' => 'Post 1', 'order' => 1, 'date' => Date.new(2024, 1, 1), 'last_modified' => Date.new(2024, 1, 2) }
+          data: { 'title' => 'Post 1', 'order' => 1, 'date' => Date.new(2024, 1, 1),
+                  'last_modified' => Date.new(2024, 1, 2) }
         )
       end
       let(:doc2) do

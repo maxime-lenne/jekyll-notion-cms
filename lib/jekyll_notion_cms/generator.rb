@@ -28,7 +28,7 @@ module JekyllNotionCMS
       Jekyll.logger.info 'NotionCMS:', 'Fetching data from Notion API...'
 
       begin
-        @client = NotionClient.new(ENV['NOTION_TOKEN'])
+        @client = NotionClient.new(ENV.fetch('NOTION_TOKEN', nil))
 
         @collections_config.each do |collection_name, collection_config|
           fetch_collection_data(collection_name, collection_config)
@@ -49,7 +49,7 @@ module JekyllNotionCMS
       env_var = config['database_env']
       data_file = config['data_file']
 
-      database_id = ENV[env_var]
+      database_id = ENV.fetch(env_var, nil)
       if database_id.nil? || database_id.empty? || database_id.start_with?('example_')
         Jekyll.logger.info 'NotionCMS:', "No #{env_var} found, using fallback for #{collection_name}"
         use_collection_fallback(collection_name, config)
@@ -80,7 +80,7 @@ module JekyllNotionCMS
     # Create a YAML data file
     def create_data_file(data, file_name, collection_name)
       data_dir = File.join(@site.source, '_data')
-      FileUtils.mkdir_p(data_dir) unless Dir.exist?(data_dir)
+      FileUtils.mkdir_p(data_dir)
 
       data_file = File.join(data_dir, file_name)
       new_content = data.to_yaml
@@ -90,7 +90,7 @@ module JekyllNotionCMS
         existing_content = File.read(data_file)
         yaml_start = existing_content.index("---\n")
         if yaml_start
-          existing_yaml = existing_content[yaml_start..-1]
+          existing_yaml = existing_content[yaml_start..]
           if existing_yaml.strip == new_content.strip
             Jekyll.logger.info 'NotionCMS:', "#{collection_name} data unchanged, skipping"
             return
@@ -126,15 +126,13 @@ module JekyllNotionCMS
       # Convert Jekyll collection to Notion-like format
       mock_data = { 'results' => [] }
 
-      if @site.collections[collection_name]
-        @site.collections[collection_name].docs.each_with_index do |doc, index|
-          mock_data['results'] << {
-            'id' => "collection_#{index}",
-            'properties' => convert_doc_to_properties(doc.data, properties_config),
-            'created_time' => doc.data['date']&.to_s,
-            'last_edited_time' => doc.data['last_modified']&.to_s
-          }
-        end
+      @site.collections[collection_name]&.docs&.each_with_index do |doc, index|
+        mock_data['results'] << {
+          'id' => "collection_#{index}",
+          'properties' => convert_doc_to_properties(doc.data, properties_config),
+          'created_time' => doc.data['date']&.to_s,
+          'last_edited_time' => doc.data['last_modified']&.to_s
+        }
       end
 
       organized_data = DataOrganizers.organize(mock_data, config)

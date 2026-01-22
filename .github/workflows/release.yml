@@ -38,7 +38,7 @@ jobs:
             See [CHANGELOG.md](https://github.com/maxime-lenne/jekyll-notion-cms/blob/main/CHANGELOG.md) for details.
           files: jekyll-notion-cms-*.gem
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Publish to RubyGems
         run: |

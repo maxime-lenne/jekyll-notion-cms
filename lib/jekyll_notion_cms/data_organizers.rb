@@ -126,7 +126,7 @@ module JekyllNotionCMS
         next if item['title'].nil? || item['title'].to_s.empty?
 
         group_key = item[group_field]
-        group_key = group_key.is_a?(Array) ? group_key.first : group_key
+        group_key = group_key.first if group_key.is_a?(Array)
         group_key ||= 'Other'
 
         grouped[group_key] ||= []

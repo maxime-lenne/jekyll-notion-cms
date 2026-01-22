@@ -312,7 +312,8 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
 
     describe 'formula property' do
       it 'extracts string formula' do
-        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'string', 'string' => 'result' } } }
+        properties = { 'Computed' => { 'type' => 'formula',
+                                       'formula' => { 'type' => 'string', 'string' => 'result' } } }
         result = described_class.extract(properties, 'Computed', 'formula')
         expect(result).to eq('result')
       end
@@ -330,7 +331,8 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
       end
 
       it 'extracts date formula' do
-        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'date', 'date' => { 'start' => '2024-01-15' } } } }
+        properties = { 'Computed' => { 'type' => 'formula',
+                                       'formula' => { 'type' => 'date', 'date' => { 'start' => '2024-01-15' } } } }
         result = described_class.extract(properties, 'Computed', 'formula')
         expect(result).to eq('2024-01-15')
       end
@@ -342,7 +344,8 @@ RSpec.describe JekyllNotionCMS::PropertyExtractors do
       end
 
       it 'returns nil for unknown formula type' do
-        properties = { 'Computed' => { 'type' => 'formula', 'formula' => { 'type' => 'unknown', 'unknown' => 'value' } } }
+        properties = { 'Computed' => { 'type' => 'formula',
+                                       'formula' => { 'type' => 'unknown', 'unknown' => 'value' } } }
         result = described_class.extract(properties, 'Computed', 'formula')
         expect(result).to be_nil
       end
