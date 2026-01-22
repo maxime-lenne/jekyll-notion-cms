@@ -361,8 +361,8 @@ The gem is available as open source under the terms of the [MIT License](https:/
 - GitHub: [@maxime-lenne](https://github.com/maxime-lenne)
 - LinkedIn: [maximelenne](https://linkedin.com/in/maximelenne)
 
-##  N8Ninja : Automate your n8n workflows from your iPhone
-<a href="https://n8n-ninja.app">N8Ninja</a> lets you manage, monitor, and trigger your n8n automations
+##  [N8Ninja](https://n8n-ninja.app): Automate your n8n workflows from your iPhone
+[N8Ninja](https://n8n-ninja.app) lets you manage, monitor, and trigger your n8n automations
 directly from your iPhone. Intuitive interface, real-time notifications,
 and full control over your workflows.
 
