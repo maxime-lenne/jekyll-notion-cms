@@ -99,7 +99,6 @@ module JekyllNotionCMS
       end
 
       # Sort categories by order
-      # Ligne 102 - Dans le sort
       items_by_category = items_by_category.sort_by { |_, data|
         order = data['order']
         (order.is_a?(Array) ? order.first : order).to_i

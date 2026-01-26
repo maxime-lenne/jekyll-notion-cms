@@ -150,6 +150,59 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
       result = described_class.organize_items_by_category(items_data, [])
       expect(result['Backend']['items'].first['name']).to eq('Ruby')
     end
+
+    context 'when category order is an array (rollup returning array)' do
+      let(:items_with_array_order) do
+        {
+          'results' => [
+            {
+              'id' => 'item-1',
+              'properties' => {
+                'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'Ruby' }] },
+                'Level' => { 'type' => 'number', 'number' => 90 },
+                'Category' => { 'type' => 'rollup',
+                                'rollup' => { 'type' => 'array',
+                                              'array' => [{ 'type' => 'title',
+                                                            'title' => [{ 'plain_text' => 'Backend' }] }] } },
+                'Category Order' => { 'type' => 'rollup',
+                                      'rollup' => { 'type' => 'array',
+                                                    'array' => [{ 'type' => 'number', 'number' => 2 }] } },
+                'Order' => { 'type' => 'number', 'number' => 1 }
+              }
+            },
+            {
+              'id' => 'item-2',
+              'properties' => {
+                'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => 'React' }] },
+                'Level' => { 'type' => 'number', 'number' => 80 },
+                'Category' => { 'type' => 'rollup',
+                                'rollup' => { 'type' => 'array',
+                                              'array' => [{ 'type' => 'title',
+                                                            'title' => [{ 'plain_text' => 'Frontend' }] }] } },
+                'Category Order' => { 'type' => 'rollup',
+                                      'rollup' => { 'type' => 'array',
+                                                    'array' => [{ 'type' => 'number', 'number' => 1 }] } },
+                'Order' => { 'type' => 'number', 'number' => 1 }
+              }
+            }
+          ]
+        }
+      end
+
+      it 'handles array values for category order when sorting' do
+        result = described_class.organize_items_by_category(items_with_array_order, [])
+        categories = result.keys
+        # Frontend (order 1) should come before Backend (order 2)
+        expect(categories.first).to eq('Frontend')
+        expect(categories.last).to eq('Backend')
+      end
+
+      it 'extracts first value from array for category order' do
+        result = described_class.organize_items_by_category(items_with_array_order, [])
+        expect(result['Frontend']['order']).to eq(1)
+        expect(result['Backend']['order']).to eq(2)
+      end
+    end
   end
 
   describe '.organize_grouped_by' do

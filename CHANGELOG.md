@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-01-26
+
+### Fixed
+
+- Category order now correctly handles array values from rollup properties
+  - Fixes sorting of categories when `Category Order` returns an array instead of a single value
+
 ## [1.0.1] - 2026-01-22
 
 ### Fixed
@@ -42,5 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Secure handling of Notion API tokens via environment variables
 
+[1.0.2]: https://github.com/maxime-lenne/jekyll-notion-cms/releases/tag/v1.0.2
 [1.0.1]: https://github.com/maxime-lenne/jekyll-notion-cms/releases/tag/v1.0.1
 [1.0.0]: https://github.com/maxime-lenne/jekyll-notion-cms/releases/tag/v1.0.0
