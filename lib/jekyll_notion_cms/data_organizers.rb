@@ -81,7 +81,7 @@ module JekyllNotionCMS
           'category' => category_name,
           'subcategory' => nil,
           'icon' => category_icon,
-          'order' => category_order || 999,
+          'order' => (category_order.is_a?(Array) ? category_order.first : category_order) || 999,
           'items' => []
         }
 
@@ -99,7 +99,11 @@ module JekyllNotionCMS
       end
 
       # Sort categories by order
-      items_by_category = items_by_category.sort_by { |_, data| data['order'].to_i }.to_h
+      # Ligne 102 - Dans le sort
+      items_by_category = items_by_category.sort_by { |_, data|
+        order = data['order']
+        (order.is_a?(Array) ? order.first : order).to_i
+      }.to_h
 
       # Sort items within each category
       items_by_category.each_value do |data|
