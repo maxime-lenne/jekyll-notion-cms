@@ -62,54 +62,75 @@ module JekyllNotionCMS
       items_by_category = {}
 
       notion_data['results'].each do |page|
-        properties = page['properties']
-
-        name = PropertyExtractors.extract(properties, 'Name', 'title')
-        next if name.nil? || name.empty?
-
-        level = PropertyExtractors.extract(properties, 'Level', 'number')
-        years = PropertyExtractors.extract(properties, 'Years', 'number')
-        featured = PropertyExtractors.extract(properties, 'Featured', 'checkbox')
-        order = PropertyExtractors.extract(properties, 'Order', 'number')
-        category_name = PropertyExtractors.extract(properties, 'Category', 'rollup') || 'Other'
-        category_icon = PropertyExtractors.extract(properties, 'Icon', 'rollup')
-        category_color = PropertyExtractors.extract(properties, 'Color', 'rollup')
-        category_order = PropertyExtractors.extract(properties, 'Category Order', 'rollup')
-
-        items_by_category[category_name] ||= {
-          'title' => category_name,
-          'category' => category_name,
-          'subcategory' => nil,
-          'icon' => category_icon,
-          'order' => (category_order.is_a?(Array) ? category_order.first : category_order) || 999,
-          'items' => []
-        }
-
-        items_by_category[category_name]['items'] << {
-          'name' => name,
-          'level' => level,
-          'years' => years,
-          'description' => nil,
-          'icon' => nil,
-          'color' => category_color,
-          'featured' => featured,
-          'order' => order || 999,
-          'id' => page['id']
-        }
+        process_category_page(page, items_by_category)
       end
 
-      # Sort categories by order
-      items_by_category = items_by_category.sort_by { |_, data|
+      sort_categories_and_items(items_by_category)
+    end
+
+    # Process a single page for category organization
+    def process_category_page(page, items_by_category)
+      properties = page['properties']
+      name = PropertyExtractors.extract(properties, 'Name', 'title')
+      return if name.nil? || name.empty?
+
+      category_data = extract_category_data(properties)
+      category_name = category_data[:name]
+
+      items_by_category[category_name] ||= build_category_hash(category_data)
+      items_by_category[category_name]['items'] << build_category_item(page, properties, name, category_data)
+    end
+
+    # Extract category-related data from properties
+    def extract_category_data(properties)
+      {
+        name: PropertyExtractors.extract(properties, 'Category', 'rollup') || 'Other',
+        icon: PropertyExtractors.extract(properties, 'Icon', 'rollup'),
+        color: PropertyExtractors.extract(properties, 'Color', 'rollup'),
+        order: PropertyExtractors.extract(properties, 'Category Order', 'rollup')
+      }
+    end
+
+    # Build the category hash structure
+    def build_category_hash(category_data)
+      order = category_data[:order]
+      {
+        'title' => category_data[:name],
+        'category' => category_data[:name],
+        'subcategory' => nil,
+        'icon' => category_data[:icon],
+        'order' => (order.is_a?(Array) ? order.first : order) || 999,
+        'items' => []
+      }
+    end
+
+    # Build an item hash for category organization
+    def build_category_item(page, properties, name, category_data)
+      {
+        'name' => name,
+        'level' => PropertyExtractors.extract(properties, 'Level', 'number'),
+        'years' => PropertyExtractors.extract(properties, 'Years', 'number'),
+        'description' => nil,
+        'icon' => nil,
+        'color' => category_data[:color],
+        'featured' => PropertyExtractors.extract(properties, 'Featured', 'checkbox'),
+        'order' => PropertyExtractors.extract(properties, 'Order', 'number') || 999,
+        'id' => page['id']
+      }
+    end
+
+    # Sort categories and their items
+    def sort_categories_and_items(items_by_category)
+      sorted = items_by_category.sort_by do |_, data|
         order = data['order']
         (order.is_a?(Array) ? order.first : order).to_i
-      }.to_h
+      end.to_h
 
-      # Sort items within each category
-      items_by_category.each_value do |data|
+      sorted.each_value do |data|
         data['items'].sort_by! { |item| item['order'].to_i }
       end
 
-      items_by_category
+      sorted
     end
 
     # Organize items grouped by a field
