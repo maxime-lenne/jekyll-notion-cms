@@ -214,15 +214,19 @@ notion:
 
 Showcase your technical expertise.
 
-**Notion Database Structure:**
+**Notion Database Structure** (`items_by_category` reads these exact property names — see
+[`items_by_category`](#organizer-types) for details):
 
 | Property | Type | Description |
 |----------|------|-------------|
 | Name | Title | Skill name |
-| Category | Select | Skill category (Backend, Frontend, etc.) |
-| Level | Select/Number | Proficiency level |
-| Icon | Rich text | Icon class or URL |
+| Category | Rollup | Category name, rolled up from a related Categories database |
+| Icon | Rollup | Category icon, rolled up from Categories |
+| Color | Rollup | Skill color |
+| Category Order | Rollup | Category display order, rolled up from Categories |
+| Level | Number | Proficiency level |
 | Years | Number | Years of experience |
+| Featured | Checkbox | Highlight this skill |
 | Order | Number | Display order within category |
 
 **Configuration:**
@@ -234,15 +238,6 @@ notion:
       database_env: NOTION_SKILLS_DB
       data_file: notion_skills.yml
       organizer: items_by_category
-      properties:
-        - { name: Name, type: title }
-        - { name: Category, type: rollup }
-        - { name: Level, type: number }
-        - { name: Icon, type: rich_text }
-        - { name: Years, type: number }
-        - { name: Order, type: number }
-        - { name: Category Icon, type: rollup, key: category_icon }
-        - { name: Category Order, type: rollup, key: category_order }
 ```
 
 **Template Usage:**
@@ -256,8 +251,11 @@ notion:
     </h3>
     <div class="skills-grid">
       {% for item in category[1].items %}
-        <div class="skill">
-          <span class="skill-name">{{ item.name }}</span>
+        <div class="skill" style="--skill-color: {{ item.color }}">
+          <span class="skill-name">
+            {{ item.name }}
+            {% if item.featured %}<span class="badge">★</span>{% endif %}
+          </span>
           <div class="skill-bar">
             <div class="skill-level" style="width: {{ item.level }}%"></div>
           </div>
@@ -305,16 +303,43 @@ Groups items by their category. Useful for skills, products, team members, or an
 organizer: items_by_category
 ```
 
+> **Note:** unlike the other organizers, `items_by_category` does **not** use the `properties:`
+> list — it reads a fixed set of property names directly from each page. Your database must use
+> these exact names:
+>
+> | Property | Type | Used for |
+> |----------|------|----------|
+> | `Name` | Title | Item name |
+> | `Category` | Rollup | Category name (groups items together) |
+> | `Icon` | Rollup | Category icon |
+> | `Color` | Rollup | Item color |
+> | `Category Order` | Rollup | Category display order |
+> | `Level` | Number | Item level |
+> | `Years` | Number | Item years |
+> | `Featured` | Checkbox | Item featured flag |
+> | `Order` | Number | Item display order within its category |
+>
+> `Category`, `Icon` and `Category Order` are typically rollups from a *Categories* database via
+> a relation field, so all items in the same category share the same icon/order.
+
 Output structure:
 ```yaml
 Backend:
   title: Backend
+  category: Backend
+  subcategory: null
   icon: code
   order: 1
   items:
     - name: Ruby
       level: 90
       years: 10
+      description: null
+      icon: null
+      color: blue
+      featured: true
+      order: 1
+      id: abc123
 ```
 
 #### `grouped_by`
