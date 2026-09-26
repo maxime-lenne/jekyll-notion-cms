@@ -203,6 +203,56 @@ RSpec.describe JekyllNotionCMS::DataOrganizers do
         expect(result['Backend']['order']).to eq(2)
       end
     end
+
+    context 'when an item belongs to several categories' do
+      def rollup(type, values)
+        array = values.map do |value|
+          type == 'number' ? { 'type' => 'number', 'number' => value } : { 'type' => type, type => [{ 'plain_text' => value }] }
+        end
+        { 'type' => 'rollup', 'rollup' => { 'type' => 'array', 'array' => array } }
+      end
+
+      def skill(id, name, categories, icons, orders)
+        {
+          'id' => id,
+          'properties' => {
+            'Name' => { 'type' => 'title', 'title' => [{ 'plain_text' => name }] },
+            'Category' => rollup('title', categories),
+            'Icon' => rollup('rich_text', icons),
+            'Category Order' => rollup('number', orders),
+            'Order' => { 'type' => 'number', 'number' => 1 }
+          }
+        }
+      end
+
+      let(:multi_category_data) do
+        {
+          'results' => [
+            skill('item-1', 'Ruby', ['Backend'], ['languages'], [3]),
+            skill('item-2', 'TypeScript', %w[Backend Frontend], %w[languages mobile], [3, 4]),
+            skill('item-3', 'Python', ['Backend', 'AI / ML'], %w[languages ai], [3, 6])
+          ]
+        }
+      end
+
+      let(:result) { described_class.organize_items_by_category(multi_category_data, []) }
+
+      it 'adds the item to each of its categories' do
+        expect(result['Backend']['items'].map { |item| item['name'] }).to contain_exactly('Ruby', 'TypeScript', 'Python')
+        expect(result['Frontend']['items'].map { |item| item['name'] }).to eq(['TypeScript'])
+        expect(result['AI / ML']['items'].map { |item| item['name'] }).to eq(['Python'])
+      end
+
+      it 'does not create a merged category' do
+        expect(result.keys).to eq(['Backend', 'Frontend', 'AI / ML'])
+        expect(result.keys).to all(be_a(String))
+      end
+
+      it 'takes the icon and order matching each category' do
+        expect(result['Frontend']).to include('title' => 'Frontend', 'icon' => 'mobile', 'order' => 4)
+        expect(result['AI / ML']).to include('title' => 'AI / ML', 'icon' => 'ai', 'order' => 6)
+      end
+    end
   end
 
   describe '.organize_grouped_by' do
