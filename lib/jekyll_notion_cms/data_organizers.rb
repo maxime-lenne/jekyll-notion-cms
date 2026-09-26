@@ -74,11 +74,35 @@ module JekyllNotionCMS
       name = PropertyExtractors.extract(properties, 'Name', 'title')
       return if name.nil? || name.empty?
 
-      category_data = extract_category_data(properties)
-      category_name = category_data[:name]
+      split_categories(extract_category_data(properties)).each do |category_data|
+        category_name = category_data[:name]
 
-      items_by_category[category_name] ||= build_category_hash(category_data)
-      items_by_category[category_name]['items'] << build_category_item(page, properties, name, category_data)
+        items_by_category[category_name] ||= build_category_hash(category_data)
+        items_by_category[category_name]['items'] << build_category_item(page, properties, name, category_data)
+      end
+    end
+
+    # An item related to several categories gets arrays from its rollups.
+    # Split them into one entry per category, pairing each name with its own icon, color and order.
+    def split_categories(category_data)
+      names = category_data[:name]
+      return [category_data] unless names.is_a?(Array) && names.size > 1
+
+      names.each_with_index.map do |category_name, index|
+        {
+          name: category_name,
+          icon: value_for_category(category_data[:icon], index, names.size),
+          color: value_for_category(category_data[:color], index, names.size),
+          order: value_for_category(category_data[:order], index, names.size)
+        }
+      end
+    end
+
+    # Rollups drop empty values, so an array only lines up with the categories when the sizes match
+    def value_for_category(value, index, category_count)
+      return value unless value.is_a?(Array)
+
+      value.size == category_count ? value[index] : nil
     end
 
     # Extract category-related data from properties
