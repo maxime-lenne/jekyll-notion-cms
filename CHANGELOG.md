@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-09-27
+
+### Fixed
+
+- `items_by_category` adds an item related to several categories to each of them
+  - Before, the item was filed under a merged category such as `["Backend", "Frontend"]`
+  - Each category takes its own icon, color and order from the rollups
+- Unchanged empty collections are no longer rewritten on every build
+  - An empty collection dumps to a single line (`--- []`) that the previous check missed,
+    which made `jekyll serve` regenerate in a loop
+- The fallback keeps data files imported from Notion instead of overwriting them
+  - Without `NOTION_TOKEN`, or when a database cannot be fetched, the last Notion data stays in `_data/`
+  - Files written by the fallback now say so in their header, and are still regenerated
+  - Delete a data file to rebuild it from the Jekyll collection
+
 ## [1.0.2] - 2026-01-26
 
 ### Fixed
